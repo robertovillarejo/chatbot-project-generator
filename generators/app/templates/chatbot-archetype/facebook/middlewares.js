@@ -1,4 +1,4 @@
-var dialogflowToFbMiddleware = require('dialogflow-to-facebook-middleware')({});
+<% if (facebookBot) { %>var dialogflowToFbMiddleware = require('dialogflow-to-facebook-middleware')({});<% } %>
 var debug = require('debug')('<%= appName %>:facebook-bot-middlewares');
 
 //Middlewares are executed in the order they appear
@@ -40,7 +40,7 @@ module.exports = function (controller) {
     <% } %>
 
     <% if(facebookBot && nlpService === "DIALOGFLOW"){ %>
-    //Every Facebook reply defined in DialogFlow 
+    //Every Facebook reply defined in DialogFlow
     //ready to send to Facebook
     debug('Configuring dialogflow-to-facebook middleware');
     controller.middleware.receive.use(dialogflowToFbMiddleware.receive);
