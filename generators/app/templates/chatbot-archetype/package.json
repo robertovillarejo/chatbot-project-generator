@@ -1,0 +1,40 @@
+{
+  "name": "<%= appName %>",
+  "version": "1.0.0",
+  "description": "<%= description %>",
+  "main": "index.js",
+  "scripts": {
+    "start": "DEBUG=<%= appName %>:* node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "conversation-create": "node conversation/create-conversation.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "<%= gitRepository %>"
+  },
+  "keywords": [
+
+  ],
+  "author": "<%= author %>",
+  "license": "MIT",
+  "bugs": {
+    "url": "<%= gitRepository %>/issues"
+  },
+  "homepage": "<%= gitRepository %>#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "botkit": "^0.6.7",
+    <% if(nlpService === "DIALOGFLOW"){ %>
+    "botkit-middleware-dialogflow": "^1.1.0",
+    <% } %>
+    "botkit-storage-mongo": "^1.0.7",
+    "debug": "^3.1.0",
+    <% if(facebookBot && nlpService === "DIALOGFLOW"){ %>
+    "dialogflow-to-facebook-middleware": "git+https://github.com/robertovillarejo/dialogflow-to-facebook-middleware.git",
+    <% } %>
+    "express": "^4.16.2",
+    "http": "0.0.0",
+    "node-env-file": "^0.1.8",
+    "xmlhttprequest": "^1.8.0"
+  }
+}

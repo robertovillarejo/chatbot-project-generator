@@ -1,0 +1,19 @@
+# Environment Config
+
+# store your secrets and config variables in here
+# only invited collaborators will be able to see your .env values
+# reference these in your code with process.env.SECRET
+
+<% if (nlpService ===  "DIALOGFLOW") { %>
+DIALOGFLOW_CLIENT_TOKEN=<%= dialogFlowConfig.clientToken %>
+DIALOGFLOW_DEVELOPER_TOKEN=<%= dialogFlowConfig.developerToken %>
+<% } %>
+<% if (facebookBot){ %>
+ACCESS_TOKEN=<%= facebookBotConfig.accessToken %>
+VERIFY_TOKEN=<%= facebookBotConfig.verifyToken %>
+<% } %>
+PORT=<%= port %>
+<% if (webhook){%>
+FULFILLMENT_ENDPOINT=<%= webhookConfig.endpoint %>
+<% } %>
+# note: .env is a shell file so there can’t be spaces around =

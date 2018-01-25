@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "Roberto Villarejo Martínez",
+      "authorEmail": "robertovillarejo@outlook.com",
+      "authorUrl": "http://robertovillarejo.github.io/"
+    }
+  }
+}
