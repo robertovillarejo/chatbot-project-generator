@@ -105,17 +105,13 @@ module.exports = class extends Generator {
   prompting() {
     // Have Yeoman greet the user.
     this.log(
-      yosay(
-        'Welcome to the awe-inspiring ' +
-          chalk.red('generator-chatbot-broker') +
-          ' generator!'
-      )
+      yosay('Welcome to the ' + chalk.red('generator-chatbot-broker') + ' generator!')
     );
 
     const prompts = [
       {
         type: 'input',
-        name: 'app-name',
+        name: 'appName',
         message: 'Your project name',
         default: this.appname
       },
@@ -148,7 +144,7 @@ module.exports = class extends Generator {
       },
       {
         type: 'input',
-        name: 'endpoint-webhook',
+        name: 'endpointWebhook',
         message: 'Your endpoint for fulfillment',
         default: '',
         when: function(answers) {
@@ -157,7 +153,7 @@ module.exports = class extends Generator {
       },
       {
         type: 'checkbox',
-        name: 'messaging-platforms',
+        name: 'messagingPlatforms',
         message: 'Messaging platforms',
         choices: [
           {
@@ -168,43 +164,43 @@ module.exports = class extends Generator {
       },
       {
         type: 'confirm',
-        name: 'facebook-menu',
+        name: 'facebookMenu',
         message: 'Do you want to generate a menu in Facebook chat?',
         default: true,
         when: function(answers) {
-          return answers['messaging-platforms'].includes('facebook');
+          return answers.messagingPlatforms.includes('facebook');
         }
       },
       {
         type: 'input',
-        name: 'app-page',
+        name: 'appPage',
         message: 'Your project page',
         default: '',
         when: function(answers) {
-          return answers['facebook-menu'];
+          return answers.facebookMenu;
         }
       },
       {
         type: 'password',
-        name: 'facebook-access-token',
+        name: 'facebookAccessToken',
         message: 'Your Facebook access token (leave empty to manual edit in .env file)',
         default: '',
         when: function(answers) {
-          return answers['messaging-platforms'].includes('facebook');
+          return answers.messagingPlatforms.includes('facebook');
         }
       },
       {
         type: 'password',
-        name: 'facebook-verify-token',
+        name: 'facebookVerifyToken',
         message: 'Your Facebook verify token (leave empty to manual edit in .env file)',
         default: '',
         when: function(answers) {
-          return answers['messaging-platforms'].includes('facebook');
+          return answers.messagingPlatforms.includes('facebook');
         }
       },
       {
         type: 'list',
-        name: 'nlp-services',
+        name: 'nlpServices',
         message: 'NLP services',
         choices: [
           {
@@ -215,26 +211,26 @@ module.exports = class extends Generator {
       },
       {
         type: 'password',
-        name: 'dialogflow-client-token',
+        name: 'dialogflowClientToken',
         message: 'Your DialogFlow client token (leave empty to manual edit in .env file)',
         default: '',
         when: function(answers) {
-          return answers['nlp-services'].includes('DIALOGFLOW');
+          return answers.nlpServices.includes('DIALOGFLOW');
         }
       },
       {
         type: 'password',
-        name: 'dialogflow-developer-token',
+        name: 'dialogflowDeveloperToken',
         message:
           'Your DialogFlow developer token (leave empty to manual edit in .env file)',
         default: '',
         when: function(answers) {
-          return answers['nlp-services'].includes('DIALOGFLOW');
+          return answers.nlpServices.includes('DIALOGFLOW');
         }
       },
       {
         type: 'input',
-        name: 'git-repository',
+        name: 'gitRepository',
         message: 'Your git remote repository',
         default: ''
       },
@@ -248,60 +244,110 @@ module.exports = class extends Generator {
 
     return this.prompt(prompts).then(props => {
       // To access props later use this.props.someAnswer;
-      this.options = props;
       this.props = props;
-      if (props['messaging-platforms'].includes('facebook')) {
-        this.options.facebook = true;
-      }
-      if (props['nlp-services'].includes('DIALOGFLOW')) {
-        this.options.nlpService = 'DIALOGFLOW';
-      }
     });
   }
 
-  writing() {
-    var options = {
-      appName: this.options['app-name'],
-      appPage: this.options['app-page'],
-      description: this.options.description,
-      author: this.options.author,
-      webhook: this.options.webhook,
+  prepareModel() {
+    if (this.props.messagingPlatforms.includes('facebook')) {
+      this.props.facebook = true;
+    }
+    if (this.props.nlpServices.includes('DIALOGFLOW')) {
+      this.props.nlpService = 'DIALOGFLOW';
+    }
+
+    var model = {
+      appName: this.props.appName,
+      appPage: this.props.appPage,
+      description: this.props.description,
+      author: this.props.author,
+      webhook: this.props.webhook,
       webhookConfig: {
-        endpoint: this.options['endpoint-webhook']
+        endpoint: this.props.endpointWebhook
       },
-      facebookBot: this.options.facebook && true,
+      facebookBot: this.props.facebook,
       facebookBotConfig: {
-        menu: this.options['facebook-menu'] && true,
-        accessToken: this.options['facebook-access-token'],
-        verifyToken: this.options['facebook-verify-token']
+        menu: this.props.facebookMenu,
+        accessToken: this.props.facebookAccessToken,
+        verifyToken: this.props.facebookVerifyToken
       },
-      nlpService: 'DIALOGFLOW',
+      nlpService: this.props.nlpService,
       dialogFlowConfig: {
-        clientToken: this.options['dialogflow-client-token'],
-        developerToken: this.options['dialogflow-developer-token']
+        clientToken: this.props.dialogflowClientToken,
+        developerToken: this.props.dialogflowDeveloperToken
       },
-      gitRepository: this.options['git-repository'],
-      license: this.options.license,
-      port: this.options.port
+      gitRepository: this.props.gitRepository,
+      license: this.props.license,
+      port: this.props.port
     };
+    this.model = model;
+  }
 
-    /* If (options.facebook) {
-      this.fs.copyTpl(
-        this.templatePath('chatbot-archetype/facebook'),
-        this.destinationPath(this.destinationRoot() + '/facebook'),
-        options);
-    } */
-
-    this.fs.copyTpl(
+  writing() {
+    /* This.fs.copyTpl(
       this.templatePath('chatbot-archetype'),
       this.destinationPath(this.destinationRoot()),
       options,
       undefined,
-      { globOptions: { dot: true } }
-    );
+      { globOptions: { dot: true, ignore: ['facebook', 'fulfillment'] } }
+    ); */
+
+    var base = [
+      'conversation',
+      'web-server',
+      '.env',
+      '.gitignore',
+      'index.js',
+      'LICENSE',
+      'package-lock.json',
+      'package.json',
+      'README.md'
+    ];
+
+    base.forEach(element => {
+      this.fs.copyTpl(
+        this.templatePath('chatbot-archetype/' + element),
+        this.destinationPath(this.destinationRoot() + '/' + element),
+        this.model,
+        undefined,
+        { globOptions: { dot: true } }
+      );
+    });
+
+    if (this.model.facebookBot) {
+      this.fs.copyTpl(
+        this.templatePath('chatbot-archetype/facebook'),
+        this.destinationPath(this.destinationRoot() + '/facebook'),
+        this.model,
+        undefined,
+        { globOptions: { dot: true } }
+      );
+    }
+
+    if (this.model.webhook) {
+      this.fs.copyTpl(
+        this.templatePath('chatbot-archetype/fulfillment'),
+        this.destinationPath(this.destinationRoot() + '/fulfillment'),
+        this.model,
+        undefined,
+        { globOptions: { dot: true } }
+      );
+    }
   }
 
   install() {
     this.npmInstall();
+  }
+
+  end() {
+    this.log(chalk.green.bold('Chatbot broker application generated successfully'));
+    this.log(chalk.green('Run your app:'));
+    this.log(chalk.yellow('npm start'));
+    this.log(
+      chalk.green.bold(
+        'If you want to generate a basic conversation in DIALOGFLOW simply run'
+      )
+    );
+    this.log(chalk.yellow('npm run conversation-create'));
   }
 };
