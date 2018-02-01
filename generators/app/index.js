@@ -125,7 +125,7 @@ module.exports = class extends Generator {
         type: 'input',
         name: 'author',
         message: 'Your name or company name',
-        default: ''
+        default: this.user.git.name()
       },
       {
         type: 'input',
